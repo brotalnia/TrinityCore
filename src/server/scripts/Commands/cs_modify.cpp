@@ -68,7 +68,7 @@ public:
             { "phase",        rbac::RBAC_PERM_COMMAND_MODIFY_PHASE,        false, &HandleModifyPhaseCommand,         "" },
             { "rage",         rbac::RBAC_PERM_COMMAND_MODIFY_RAGE,         false, &HandleModifyRageCommand,          "" },
             { "reputation",   rbac::RBAC_PERM_COMMAND_MODIFY_REPUTATION,   false, &HandleModifyRepCommand,           "" },
-            { "runicpower",   rbac::RBAC_PERM_COMMAND_MODIFY_RUNICPOWER,   false, &HandleModifyRunicPowerCommand,    "" },
+            // { "runicpower",   rbac::RBAC_PERM_COMMAND_MODIFY_RUNICPOWER,   false, &HandleModifyRunicPowerCommand,    "" },
             { "scale",        rbac::RBAC_PERM_COMMAND_MODIFY_SCALE,        false, &HandleModifyScaleCommand,         "" },
             { "speed",        rbac::RBAC_PERM_COMMAND_MODIFY_SPEED,        false, NULL,           "", modifyspeedCommandTable },
             { "spell",        rbac::RBAC_PERM_COMMAND_MODIFY_SPELL,        false, &HandleModifySpellCommand,         "" },
@@ -183,22 +183,6 @@ public:
             NotifyModification(handler, target, LANG_YOU_CHANGE_RAGE, LANG_YOURS_RAGE_CHANGED, rage / rageMultiplier, ragemax / rageMultiplier);
             target->SetMaxPower(POWER_RAGE, ragemax);
             target->SetPower(POWER_RAGE, rage);
-            return true;
-        }
-        return false;
-    }
-
-    // Edit Player Runic Power
-    static bool HandleModifyRunicPowerCommand(ChatHandler* handler, const char* args)
-    {
-        int32 rune, runemax;
-        Player* target = handler->getSelectedPlayerOrSelf();
-        int8 const runeMultiplier = 10;
-        if (CheckModifyResources(handler, args, target, rune, runemax, runeMultiplier))
-        {
-            NotifyModification(handler, target, LANG_YOU_CHANGE_RUNIC_POWER, LANG_YOURS_RUNIC_POWER_CHANGED, rune / runeMultiplier, runemax / runeMultiplier);
-            target->SetMaxPower(POWER_RUNIC_POWER, runemax);
-            target->SetPower(POWER_RUNIC_POWER, rune);
             return true;
         }
         return false;
@@ -1050,7 +1034,7 @@ public:
             return false;
         }
 
-        if (target->GetPowerIndex(Powers(powerType->PowerTypeEnum)) == MAX_POWERS)
+        if (Powers(powerType->PowerTypeEnum) == MAX_POWERS)
         {
             handler->SendSysMessage(LANG_INVALID_POWER_NAME);
             handler->SetSentErrorMessage(true);

@@ -723,7 +723,6 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         if (damagetype != DOT)
         {
             Pet* pet = victim->ToPlayer()->GetPet();
-
             if (pet && pet->IsAlive())
                 pet->AI()->OwnerAttackedBy(this);
         }
@@ -761,26 +760,29 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
         AuraEffectList vCopyDamageCopy(victim->GetAuraEffectsByType(SPELL_AURA_SHARE_DAMAGE_PCT));
+
         // copy damage to casters of this aura
-        for (AuraEffectList::iterator i = vCopyDamageCopy.begin(); i != vCopyDamageCopy.end(); ++i)
+        for (auto const& auraEffect : vCopyDamageCopy)
         {
             // Check if aura was removed during iteration - we don't need to work on such auras
-            if (!((*i)->GetBase()->IsAppliedOnTarget(victim->GetGUID())))
-                continue;
-            // check damage school mask
-            if (((*i)->GetMiscValue() & damageSchoolMask) == 0)
+            if (auraEffect->GetBase()->IsAppliedOnTarget(victim->GetGUID()))
                 continue;
 
-            Unit* shareDamageTarget = (*i)->GetCaster();
+            // Check damage school mask
+            if ((auraEffect->GetMiscValue() & damageSchoolMask) == 0)
+                continue;
+
+            Unit* shareDamageTarget = auraEffect->GetCaster();
             if (!shareDamageTarget)
                 continue;
-            SpellInfo const* spell = (*i)->GetSpellInfo();
 
-            uint32 share = CalculatePct(damage, (*i)->GetAmount());
+            SpellInfo const* spell = auraEffect->GetSpellInfo();
+
+            uint32 share = CalculatePct(damage, auraEffect->GetAmount());
 
             /// @todo check packets if damage is done by victim, or by attacker of victim
-            DealDamageMods(shareDamageTarget, share, NULL);
-            DealDamage(shareDamageTarget, share, NULL, NODAMAGE, spell->GetSchoolMask(), spell, false);
+            DealDamageMods(shareDamageTarget, share, nullptr);
+            DealDamage(shareDamageTarget, share, nullptr, NODAMAGE, spell->GetSchoolMask(), spell, false);
         }
     }
 
@@ -850,7 +852,6 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         if (health <= damage)
         {
             TC_LOG_DEBUG("entities.unit", "DealDamage: victim just died");
-
 
             Kill(victim, durabilityLoss);
         }
@@ -6624,8 +6625,8 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask) const
         DoneAdvertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
 
         // Check if we are ever using mana - PaperDollFrame.lua
-        if (GetPowerIndex(POWER_MANA) != MAX_POWERS)
-            DoneAdvertisedBenefit += std::max(0, int32(GetStat(STAT_INTELLECT)));  // spellpower from intellect
+        // if (GetPowerIndex(POWER_MANA) != MAX_POWERS)
+        //     DoneAdvertisedBenefit += std::max(0, int32(GetStat(STAT_INTELLECT)));  // spellpower from intellect
 
         // Damage bonus from stats
         AuraEffectList const& mDamageDoneOfStatPercent = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT);
@@ -7050,8 +7051,8 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask) const
         advertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
 
         // Check if we are ever using mana - PaperDollFrame.lua
-        if (GetPowerIndex(POWER_MANA) != MAX_POWERS)
-            advertisedBenefit += std::max(0, int32(GetStat(STAT_INTELLECT)));  // spellpower from intellect
+        // if (GetPowerIndex(POWER_MANA) != MAX_POWERS)
+        //     advertisedBenefit += std::max(0, int32(GetStat(STAT_INTELLECT)));  // spellpower from intellect
 
         // Healing bonus from stats
         AuraEffectList const& mHealingDoneOfStatPercent = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT);
@@ -7574,9 +7575,6 @@ MountCapabilityEntry const* Unit::GetMountCapability(uint32 mountType) const
     bool isSubmerged = false;
     bool isInWater = false;
 
-    if (GetTypeId() == TYPEID_PLAYER)
-        ridingSkill = ToPlayer()->GetSkillValue(SKILL_RIDING);
-
     if (HasAuraType(SPELL_AURA_MOUNT_RESTRICTIONS))
     {
         for (AuraEffect const* auraEffect : GetAuraEffectsByType(SPELL_AURA_MOUNT_RESTRICTIONS))
@@ -7722,11 +7720,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         return;
 
     if (PvP)
-    {
         m_CombatTimer = 5000;
-        if (Player* me = ToPlayer())
-            me->EnablePvpRules(true);
-    }
 
     if (IsInCombat() || HasUnitState(UNIT_STATE_EVADE))
         return;
@@ -8038,43 +8032,33 @@ bool Unit::_IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) co
     return true;
 }
 
-int64 Unit::ModifyHealth(int64 dVal)
+int32 Unit::ModifyHealth(int32 dVal)
 {
-    int64 gain = 0;
 
     if (dVal == 0)
         return 0;
 
-    int64 curHealth = (int64)GetHealth();
+    int32 curHealth = (int32)GetHealth();
 
-    int64 val = dVal + curHealth;
+    int32 val = dVal + curHealth;
     if (val <= 0)
     {
         SetHealth(0);
         return -curHealth;
     }
 
-    int64 maxHealth = (int64)GetMaxHealth();
+    int32 maxHealth = (int32)GetMaxHealth();
 
+    int32 gain = 0;
     if (val < maxHealth)
     {
         SetHealth(val);
         gain = val - curHealth;
     }
-    else if (curHealth != maxHealth)
+    else
     {
         SetHealth(maxHealth);
         gain = maxHealth - curHealth;
-    }
-
-    if (dVal < 0)
-    {
-        WorldPackets::Combat::HealthUpdate packet;
-        packet.Guid = GetGUID();
-        packet.Health = GetHealth();
-
-        if (Player* player = GetCharmerOrOwnerPlayerOrPlayerItself())
-            player->GetSession()->SendPacket(packet.Write());
     }
 
     return gain;
@@ -9169,21 +9153,7 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_RAGE:
         case UNIT_MOD_FOCUS:
         case UNIT_MOD_ENERGY:
-        case UNIT_MOD_COMBO_POINTS:
-        case UNIT_MOD_RUNES:
-        case UNIT_MOD_RUNIC_POWER:
-        case UNIT_MOD_SOUL_SHARDS:
-        case UNIT_MOD_LUNAR_POWER:
-        case UNIT_MOD_HOLY_POWER:
-        case UNIT_MOD_ALTERNATE:
-        case UNIT_MOD_MAELSTROM:
-        case UNIT_MOD_CHI:
-        case UNIT_MOD_INSANITY:
-        case UNIT_MOD_BURNING_EMBERS:
-        case UNIT_MOD_DEMONIC_FURY:
-        case UNIT_MOD_ARCANE_CHARGES:
-        case UNIT_MOD_FURY:
-        case UNIT_MOD_PAIN:                UpdateMaxPower(Powers(unitMod - UNIT_MOD_POWER_START));     break;
+        case UNIT_MOD_COMBO_POINTS:         UpdateMaxPower(Powers(unitMod - UNIT_MOD_POWER_START));     break;
 
         case UNIT_MOD_RESISTANCE_HOLY:
         case UNIT_MOD_RESISTANCE_FIRE:
@@ -9353,20 +9323,13 @@ void Unit::SetLevel(uint8 lvl)
     }
 }
 
-void Unit::SetHealth(uint64 val)
+void Unit::SetHealth(int32 val)
 {
-    if (getDeathState() == JUST_DIED)
-        val = 0;
-    else if (GetTypeId() == TYPEID_PLAYER && getDeathState() == DEAD)
-        val = 1;
-    else
-    {
-        uint64 maxHealth = GetMaxHealth();
-        if (maxHealth < val)
-            val = maxHealth;
-    }
+    uint32 maxHealth = GetMaxHealth();
+    if (maxHealth < val)
+        val = maxHealth;
 
-    SetUInt64Value(UNIT_FIELD_HEALTH, val);
+    SetUInt32Value(UNIT_FIELD_HEALTH, val);
 
     // group update
     if (Player* player = ToPlayer())
@@ -9381,13 +9344,13 @@ void Unit::SetHealth(uint64 val)
     }
 }
 
-void Unit::SetMaxHealth(uint64 val)
+void Unit::SetMaxHealth(int32 val)
 {
     if (!val)
         val = 1;
 
-    uint64 health = GetHealth();
-    SetUInt64Value(UNIT_FIELD_MAXHEALTH, val);
+    int32 health = GetHealth();
+    SetUInt32Value(UNIT_FIELD_MAXHEALTH, val);
 
     // group update
     if (GetTypeId() == TYPEID_PLAYER)
@@ -9405,35 +9368,13 @@ void Unit::SetMaxHealth(uint64 val)
         SetHealth(val);
 }
 
-int32 Unit::GetPower(Powers power) const
-{
-    uint32 powerIndex = GetPowerIndex(power);
-    if (powerIndex == MAX_POWERS || powerIndex >= MAX_POWERS_PER_CLASS)
-        return 0;
-
-    return GetUInt32Value(UNIT_FIELD_POWER + powerIndex);
-}
-
-int32 Unit::GetMaxPower(Powers power) const
-{
-    uint32 powerIndex = GetPowerIndex(power);
-    if (powerIndex == MAX_POWERS || powerIndex >= MAX_POWERS_PER_CLASS)
-        return 0;
-
-    return GetInt32Value(UNIT_FIELD_MAXPOWER + powerIndex);
-}
-
 void Unit::SetPower(Powers power, int32 val)
 {
-    uint32 powerIndex = GetPowerIndex(power);
-    if (powerIndex == MAX_POWERS || powerIndex >= MAX_POWERS_PER_CLASS)
-        return;
-
     int32 maxPower = GetMaxPower(power);
     if (maxPower < val)
         val = maxPower;
 
-    SetInt32Value(UNIT_FIELD_POWER + powerIndex, val);
+    SetStatInt32Value(UNIT_FIELD_POWER + power, val);
 
     if (IsInWorld())
     {
@@ -9450,21 +9391,19 @@ void Unit::SetPower(Powers power, int32 val)
         if (player->GetGroup())
             player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_CUR_POWER);
     }
-    /*else if (Pet* pet = ToCreature()->ToPet()) TODO 6.x
+
+    if (IsPet())
     {
-        if (pet->isControlled())
-            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
-    }*/
+        Pet* pet = ToPet();
+        if (pet->getPetType() == HUNTER_PET && power == POWER_HAPINESS)
+            pet->UpdateDamagePhysical(BASE_ATTACK);
+    }
 }
 
 void Unit::SetMaxPower(Powers power, int32 val)
 {
-    uint32 powerIndex = GetPowerIndex(power);
-    if (powerIndex == MAX_POWERS || powerIndex >= MAX_POWERS_PER_CLASS)
-        return;
-
     int32 cur_power = GetPower(power);
-    SetInt32Value(UNIT_FIELD_MAXPOWER + powerIndex, val);
+    SetStatInt32Value(UNIT_FIELD_MAXPOWER + power, val);
 
     // group update
     if (GetTypeId() == TYPEID_PLAYER)
@@ -9472,11 +9411,6 @@ void Unit::SetMaxPower(Powers power, int32 val)
         if (ToPlayer()->GetGroup())
             ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_MAX_POWER);
     }
-    /*else if (Pet* pet = ToCreature()->ToPet()) TODO 6.x
-    {
-        if (pet->isControlled())
-            pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MAX_POWER);
-    }*/
 
     if (val < cur_power)
         SetPower(power, val);
@@ -12097,6 +12031,7 @@ uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float c
     return CalculatePct(damage, percent);
 }
 
+// @TODO: I don't think this happens in Classic??
 uint32 Unit::GetModelForForm(ShapeshiftForm form) const
 {
     if (GetTypeId() == TYPEID_PLAYER)
@@ -12157,53 +12092,6 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                             return 33665;
                         default: // Original - White
                             return 33669;
-                    }
-                }
-                else if (getRace() == RACE_WORGEN)
-                {
-                    // Based on Skin color
-                    uint8 skinColor = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID);
-                    if (HasAura(210333)) // Glyph of the Feral Chameleon
-                        skinColor = urand(0, 9);
-
-                    // Male
-                    if (getGender() == GENDER_MALE)
-                    {
-                        switch (skinColor)
-                        {
-                            case 1: // Brown
-                                return 33662;
-                            case 2: // Black
-                            case 7:
-                                return 33661;
-                            case 4: // Yellow
-                                return 33664;
-                            case 3: // White
-                            case 5:
-                                return 33663;
-                            default: // Original - Gray
-                                return 33660;
-                        }
-                    }
-                    // Female
-                    else
-                    {
-                        switch (skinColor)
-                        {
-                            case 5: // Brown
-                            case 6:
-                                return 33662;
-                            case 7: // Black
-                            case 8:
-                                return 33661;
-                            case 3: // yellow
-                            case 4:
-                                return 33664;
-                            case 2: // White
-                                return 33663;
-                            default: // Original - Gray
-                                return 33660;
-                        }
                     }
                 }
                 // Based on Skin color
@@ -12319,53 +12207,6 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                             return 33655;
                     }
                 }
-                else if (getRace() == RACE_WORGEN)
-                {
-                    // Based on Skin color
-                    uint8 skinColor = GetByteValue(PLAYER_BYTES, PLAYER_BYTES_OFFSET_SKIN_ID);
-                    if (HasAura(107059)) // Glyph of the Ursol Chameleon
-                        skinColor = urand(0, 8);
-
-                    // Male
-                    if (getGender() == GENDER_MALE)
-                    {
-                        switch (skinColor)
-                        {
-                            case 1: // Brown
-                                return 33652;
-                            case 2: // Black
-                            case 7:
-                                return 33651;
-                            case 4: // Yellow
-                                return 33653;
-                            case 3: // White
-                            case 5:
-                                return 33654;
-                            default: // Original - Gray
-                                return 33650;
-                        }
-                    }
-                    // Female
-                    else
-                    {
-                        switch (skinColor)
-                        {
-                            case 5: // Brown
-                            case 6:
-                                return 33652;
-                            case 7: // Black
-                            case 8:
-                                return 33651;
-                            case 3: // yellow
-                            case 4:
-                                return 33654;
-                            case 2: // White
-                                return 33653;
-                            default: // Original - Gray
-                                return 33650;
-                        }
-                    }
-                }
                 // Based on Skin color
                 else if (getRace() == RACE_TAUREN)
                 {
@@ -12442,8 +12283,6 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                             return 64328;
                         case RACE_TAUREN: // Brown
                             return 64329;
-                        case RACE_WORGEN: // Purple
-                            return 64330;
                         case RACE_TROLL: // White
                             return 64331;
                         default:
@@ -12451,7 +12290,7 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                     }
                 }
                 if (Player::TeamForRace(getRace()) == ALLIANCE)
-                    return (getRace() == RACE_WORGEN ? 37729 : 21243);
+                    return 21243;
                 if (getRace() == RACE_TROLL)
                     return 37730;
                 return 21244;
@@ -12463,8 +12302,6 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                         return 15374;
                     case RACE_TAUREN:
                         return 15375;
-                    case RACE_WORGEN:
-                        return 37173;
                     case RACE_TROLL:
                         return 37174;
                     default:
@@ -12487,7 +12324,6 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                 switch (getRace())
                 {
                     case RACE_NIGHTELF:
-                    case RACE_WORGEN:
                         return 40816;
                     case RACE_TROLL:
                     case RACE_TAUREN:

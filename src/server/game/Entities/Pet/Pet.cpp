@@ -807,8 +807,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     if (IsPet() && GetOwner()->GetTypeId() == TYPEID_PLAYER)
     {
         if (GetOwner()->getClass() == CLASS_WARLOCK
-            || GetOwner()->getClass() == CLASS_SHAMAN        // Fire Elemental
-            || GetOwner()->getClass() == CLASS_DEATH_KNIGHT) // Risen Ghoul
+            || GetOwner()->getClass() == CLASS_SHAMAN)       // Fire Elemental
         {
             petType = SUMMON_PET;
         }
@@ -1642,8 +1641,6 @@ bool Pet::IsPermanentPetFor(Player* owner) const
             {
                 case CLASS_WARLOCK:
                     return GetCreatureTemplate()->type == CREATURE_TYPE_DEMON;
-                case CLASS_DEATH_KNIGHT:
-                    return GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD;
                 case CLASS_MAGE:
                     return GetCreatureTemplate()->type == CREATURE_TYPE_ELEMENTAL;
                 default:

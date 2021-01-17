@@ -301,17 +301,8 @@ void Player::UpdateMaxHealth()
     SetMaxHealth((uint32)value);
 }
 
-uint32 Player::GetPowerIndex(Powers power) const
-{
-    return sDB2Manager.GetPowerIndexByClass(power, getClass());
-}
-
 void Player::UpdateMaxPower(Powers power)
 {
-    uint32 powerIndex = GetPowerIndex(power);
-    if (powerIndex == MAX_POWERS || powerIndex >= MAX_POWERS_PER_CLASS)
-        return;
-
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);
@@ -606,13 +597,10 @@ const float m_diminishing_k[MAX_CLASSES] =
     0.9880f,  // Hunter
     0.9880f,  // Rogue
     0.9830f,  // Priest
-    0.9560f,  // DK
     0.9880f,  // Shaman
     0.9830f,  // Mage
     0.9830f,  // Warlock
-    0.9830f,  // Monk
     0.9720f,  // Druid
-    0.9830f   // Demon Hunter
 };
 
 void Player::UpdateParryPercentage()
@@ -624,13 +612,10 @@ void Player::UpdateParryPercentage()
         145.560408f,    // Hunter
         145.560408f,    // Rogue
         0.0f,           // Priest
-        65.631440f,     // DK
         145.560408f,    // Shaman
         0.0f,           // Mage
         0.0f,           // Warlock
-        90.6425f,       // Monk
         0.0f,           // Druid
-        65.631440f      // Demon Hunter
     };
 
     // No parry
@@ -663,13 +648,10 @@ void Player::UpdateDodgePercentage()
         145.560408f,    // Hunter
         145.560408f,    // Rogue
         150.375940f,    // Priest
-        65.631440f,     // DK
         145.560408f,    // Shaman
         150.375940f,    // Mage
         150.375940f,    // Warlock
-        145.560408f,    // Monk
         116.890707f,    // Druid
-        145.560408f     // Demon Hunter
     };
 
     float diminishing = 0.0f, nondiminishing = 0.0f;
@@ -769,10 +751,6 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
-    uint32 manaIndex = GetPowerIndex(POWER_MANA);
-    if (manaIndex == MAX_POWERS)
-        return;
-
     // Get base of Mana Pool in sBaseMPGameTable
     uint32 basemana = 0;
     sObjectMgr->GetPlayerClassLevelInfo(getClass(), getLevel(), basemana);
@@ -786,22 +764,7 @@ void Player::UpdateManaRegen()
     // Apply PCT bonus from SPELL_AURA_MOD_MANA_REGEN_PCT
     base_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_MANA_REGEN_PCT, POWER_MANA);
 
-    SetStatFloatValue(UNIT_FIELD_MOD_POWER_REGEN + manaIndex, base_regen);
-}
-
-void Player::UpdateAllRunesRegen()
-{
-    if (getClass() != CLASS_DEATH_KNIGHT)
-        return;
-
-    uint32 runeIndex = GetPowerIndex(POWER_RUNES);
-    if (runeIndex == MAX_POWERS)
-        return;
-
-    PowerTypeEntry const* runeEntry = sDB2Manager.GetPowerTypeEntry(POWER_RUNES);
-
-    uint32 cooldown = GetRuneBaseCooldown();
-    SetStatFloatValue(UNIT_FIELD_MOD_POWER_REGEN + runeIndex, float(1 * IN_MILLISECONDS) / float(cooldown) - runeEntry->RegenPeace);
+    SetStatFloatValue(UNIT_FIELD_MOD_POWER_REGEN + Powers::POWER_MANA, base_regen);
 }
 
 void Player::_ApplyAllStatBonuses()
@@ -866,22 +829,8 @@ void Creature::UpdateMaxHealth()
     SetMaxHealth(uint32(value));
 }
 
-uint32 Creature::GetPowerIndex(Powers power) const
-{
-    if (power == GetPowerType())
-        return 0;
-    if (power == POWER_ALTERNATE_POWER)
-        return 1;
-    if (power == POWER_COMBO_POINTS)
-        return 2;
-    return MAX_POWERS;
-}
-
 void Creature::UpdateMaxPower(Powers power)
 {
-    if (GetPowerIndex(power) == MAX_POWERS)
-        return;
-
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);
@@ -1131,9 +1080,6 @@ void Guardian::UpdateMaxHealth()
 
 void Guardian::UpdateMaxPower(Powers power)
 {
-    if (GetPowerIndex(power) == MAX_POWERS)
-        return;
-
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);

@@ -80,7 +80,7 @@ uint32 ItemTemplate::GetSkill() const
     static uint32 const itemWeaponSkills[MAX_ITEM_SUBCLASS_WEAPON] =
     {
         SKILL_AXES,             SKILL_TWO_HANDED_AXES, SKILL_BOWS,   SKILL_GUNS,              SKILL_MACES,
-        SKILL_TWO_HANDED_MACES, SKILL_POLEARMS,        SKILL_SWORDS, SKILL_TWO_HANDED_SWORDS, SKILL_WARGLAIVES,
+        SKILL_TWO_HANDED_MACES, SKILL_POLEARMS,        SKILL_SWORDS, SKILL_TWO_HANDED_SWORDS,
         SKILL_STAVES,           0,                     0,            SKILL_FIST_WEAPONS,      0,
         SKILL_DAGGERS,          0,                     0,            SKILL_CROSSBOWS,         SKILL_WANDS,
         SKILL_FISHING

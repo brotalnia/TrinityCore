@@ -126,8 +126,9 @@ public:
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, handler->GetSession()->GetPlayer(), false))
                 continue;
 
-            if (!spellInfo->IsAbilityOfSkillType(SKILL_INTERNAL))
-                continue;
+            // @TODO: Find a way to identify GM spells
+            // if (!spellInfo->IsAbilityOfSkillType(SKILL_INTERNAL))
+            //     continue;
 
             handler->GetSession()->GetPlayer()->LearnSpell(i, false);
         }

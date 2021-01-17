@@ -790,29 +790,28 @@ void Object::BuildMovementUpdate(ByteBuffer* data, CreateObjectBits flags) const
     if (flags.ActivePlayer)
     {
         bool HasSceneInstanceIDs = false;
-        bool HasRuneState = ToUnit()->GetPowerIndex(POWER_RUNES) != MAX_POWERS;
+        bool HasRuneState = false;
 
         data->WriteBit(HasSceneInstanceIDs);
         data->WriteBit(HasRuneState);
         data->FlushBits();
-        //if (HasSceneInstanceIDs)
-        //{
-        //    *data << uint32(SceneInstanceIDs.size());
-        //    for (std::size_t i = 0; i < SceneInstanceIDs.size(); ++i)
-        //        *data << uint32(SceneInstanceIDs[i]);
-        //}
-        if (HasRuneState)
-        {
-            Player const* player = ToPlayer();
-            float baseCd = float(player->GetRuneBaseCooldown());
-            uint32 maxRunes = uint32(player->GetMaxPower(POWER_RUNES));
-
-            *data << uint8((1 << maxRunes) - 1);
-            *data << uint8(player->GetRunesState());
-            *data << uint32(maxRunes);
-            for (uint32 i = 0; i < maxRunes; ++i)
-                *data << uint8((baseCd - float(player->GetRuneCooldown(i))) / baseCd * 255);
-        }
+        // if (HasSceneInstanceIDs)
+        // {
+        //     *data << uint32(SceneInstanceIDs.size());
+        //     for (std::size_t i = 0; i < SceneInstanceIDs.size(); ++i)
+        //         *data << uint32(SceneInstanceIDs[i]);
+        // }
+        // if (HasRuneState)
+        // {
+        //     Player const* player = ToPlayer();
+        //     float baseCd = float(player->GetRuneBaseCooldown());
+        //
+        //     *data << uint8((1 << 0) - 1);
+        //     *data << uint8(player->GetRunesState());
+        //     *data << uint32(0);
+        //     for (uint32 i = 0; i < 0; ++i)
+        //         *data << uint8((baseCd - float(player->GetRuneCooldown(i))) / baseCd * 255);
+        // }
     }
 
     if (flags.Conversation)

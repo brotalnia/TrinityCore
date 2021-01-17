@@ -19,7 +19,6 @@
 #include "Item.h"
 #include "ArtifactPackets.h"
 #include "Bag.h"
-#include "CollectionMgr.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DatabaseEnv.h"
@@ -1595,8 +1594,6 @@ void Item::SetNotRefundable(Player* owner, bool changestate /*= true*/, SQLTrans
     DeleteRefundDataFromDB(trans);
 
     owner->DeleteRefundReference(GetGUID());
-    if (addToCollection)
-        owner->GetSession()->GetCollectionMgr()->AddItemAppearance(this);
 }
 
 void Item::UpdatePlayedTime(Player* owner)
@@ -1651,7 +1648,6 @@ void Item::ClearSoulboundTradeable(Player* currentOwner)
     if (allowedGUIDs.empty())
         return;
 
-    currentOwner->GetSession()->GetCollectionMgr()->AddItemAppearance(this);
     allowedGUIDs.clear();
     SetState(ITEM_CHANGED, currentOwner);
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_BOP_TRADE);

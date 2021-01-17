@@ -17,7 +17,6 @@
  */
 
 #include "WorldSession.h"
-#include "CollectionMgr.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GameObjectAI.h"
@@ -116,7 +115,6 @@ void WorldSession::HandleUseItemOpcode(WorldPackets::Spells::UseItem& packet)
         {
             item->SetState(ITEM_CHANGED, user);
             item->SetBinding(true);
-            GetCollectionMgr()->AddItemAppearance(item);
         }
     }
 

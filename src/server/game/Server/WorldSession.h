@@ -35,9 +35,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class BattlePetMgr;
-class BlackMarketEntry;
-class CollectionMgr;
 class Creature;
 class InstanceSave;
 class Item;
@@ -48,7 +45,6 @@ class Warden;
 class WorldSession;
 class WorldSocket;
 struct AuctionEntry;
-struct BlackMarketTemplate;
 struct DeclinedName;
 struct ItemTemplate;
 struct MovementInfo;
@@ -56,19 +52,19 @@ struct Position;
 
 namespace lfg
 {
-struct LfgJoinResultData;
-struct LfgPlayerBoot;
-struct LfgProposal;
-struct LfgQueueStatusData;
-struct LfgPlayerRewardData;
-struct LfgRoleCheck;
-struct LfgUpdateData;
-enum LfgTeleportResult : uint8;
+    struct LfgJoinResultData;
+    struct LfgPlayerBoot;
+    struct LfgProposal;
+    struct LfgQueueStatusData;
+    struct LfgPlayerRewardData;
+    struct LfgRoleCheck;
+    struct LfgUpdateData;
+    enum LfgTeleportResult : uint8;
 }
 
 namespace rbac
 {
-class RBACData;
+    class RBACData;
 }
 
 namespace WorldPackets
@@ -145,17 +141,6 @@ namespace WorldPackets
     {
         class Request;
         class RequestRealmListTicket;
-    }
-
-    namespace BattlePet
-    {
-        class BattlePetRequestJournal;
-        class BattlePetSetBattleSlot;
-        class BattlePetModifyName;
-        class BattlePetDeletePet;
-        class BattlePetSetFlags;
-        class BattlePetSummon;
-        class CageBattlePet;
     }
 
     namespace BlackMarket
@@ -252,11 +237,6 @@ namespace WorldPackets
         class ChatRegisterAddonPrefixes;
         class ChatUnregisterAllAddonPrefixes;
         class ChatReportIgnored;
-    }
-
-    namespace Collections
-    {
-        class CollectionItemSetFavorite;
     }
 
     namespace Combat
@@ -587,27 +567,9 @@ namespace WorldPackets
         class ChoiceResponse;
     }
 
-    namespace RaF
-    {
-        class AcceptLevelGrant;
-        class GrantLevel;
-    }
-
     namespace Reputation
     {
         class RequestForcedReactions;
-    }
-
-    namespace Toy
-    {
-        class AccountToysUpdate;
-        class AddToy;
-        class UseToy;
-    }
-
-    namespace Scenario
-    {
-        class QueryScenarioPOI;
     }
 
     namespace Scenes
@@ -705,11 +667,6 @@ namespace WorldPackets
         class TradeStatus;
     }
 
-    namespace Transmogrification
-    {
-        class TransmogrifyItems;
-    }
-
     namespace Vehicle
     {
         class MoveDismissVehicle;
@@ -721,14 +678,6 @@ namespace WorldPackets
         class EjectPassenger;
         class RequestVehicleExit;
         class MoveSetVehicleRecIdAck;
-    }
-
-    namespace VoidStorage
-    {
-        class UnlockVoidStorage;
-        class QueryVoidStorage;
-        class VoidStorageTransfer;
-        class SwapVoidItem;
     }
 
     namespace Warden
@@ -1024,12 +973,6 @@ class TC_GAME_API WorldSession
         void SendAuctionWonNotification(AuctionEntry const* auction, Item const* item);
         void SendAuctionOwnerBidNotification(AuctionEntry const* auction, Item const* item);
 
-        // Black Market
-        void SendBlackMarketOpenResult(ObjectGuid guid, Creature* auctioneer);
-        void SendBlackMarketBidOnItemResult(int32 result, int32 marketId, WorldPackets::Item::ItemInstance& item);
-        void SendBlackMarketWonNotification(BlackMarketEntry const* entry, Item const* item);
-        void SendBlackMarketOutbidNotification(BlackMarketTemplate const* templ);
-
         //Item Enchantment
         void SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId);
         void SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration);
@@ -1077,11 +1020,6 @@ class TC_GAME_API WorldSession
         // Recruit-A-Friend Handling
         uint32 GetRecruiterId() const { return recruiterId; }
         bool IsARecruiter() const { return isRecruiter; }
-
-        // Battle Pets
-        BattlePetMgr* GetBattlePetMgr() const { return _battlePetMgr.get(); }
-
-        CollectionMgr* GetCollectionMgr() const { return _collectionMgr.get(); }
 
     public:                                                 // opcodes handlers
 
@@ -1414,7 +1352,6 @@ class TC_GAME_API WorldSession
         void HandleMissileTrajectoryCollision(WorldPackets::Spells::MissileTrajectoryCollision& packet);
         void HandleUpdateMissileTrajectory(WorldPackets::Spells::UpdateMissileTrajectory& packet);
 
-        void HandleLearnPvpTalentsOpcode(WorldPackets::Talent::LearnPvpTalents& packet);
         void HandleLearnTalentsOpcode(WorldPackets::Talent::LearnTalents& packet);
         void HandleConfirmRespecWipeOpcode(WorldPackets::Talent::ConfirmRespecWipe& confirmRespecWipe);
         void HandleUnlearnSkillOpcode(WorldPackets::Spells::UnlearnSkill& packet);
@@ -1586,10 +1523,6 @@ class TC_GAME_API WorldSession
         void HandleGuildBankTextQuery(WorldPackets::Guild::GuildBankTextQuery& packet);
         void HandleGuildBankSetTabText(WorldPackets::Guild::GuildBankSetTabText& packet);
 
-        // Refer-a-Friend
-        void HandleGrantLevel(WorldPackets::RaF::GrantLevel& grantLevel);
-        void HandleAcceptGrantLevel(WorldPackets::RaF::AcceptLevelGrant& acceptLevelGrant);
-
         // Calendar
         void HandleCalendarGetCalendar(WorldPackets::Calendar::CalendarGetCalendar& calendarGetCalendar);
         void HandleCalendarGetEvent(WorldPackets::Calendar::CalendarGetEvent& calendarGetEvent);
@@ -1611,19 +1544,6 @@ class TC_GAME_API WorldSession
         void SendCalendarRaidLockoutUpdated(InstanceSave const* save);
         void HandleSetSavedInstanceExtend(WorldPackets::Calendar::SetSavedInstanceExtend& setSavedInstanceExtend);
 
-        // Void Storage
-        void HandleVoidStorageUnlock(WorldPackets::VoidStorage::UnlockVoidStorage& unlockVoidStorage);
-        void HandleVoidStorageQuery(WorldPackets::VoidStorage::QueryVoidStorage& queryVoidStorage);
-        void HandleVoidStorageTransfer(WorldPackets::VoidStorage::VoidStorageTransfer& voidStorageTransfer);
-        void HandleVoidSwapItem(WorldPackets::VoidStorage::SwapVoidItem& swapVoidItem);
-        void SendVoidStorageTransferResult(VoidTransferError result);
-
-        // Collections
-        void HandleCollectionItemSetFavorite(WorldPackets::Collections::CollectionItemSetFavorite& collectionItemSetFavorite);
-
-        // Transmogrification
-        void HandleTransmogrifyItems(WorldPackets::Transmogrification::TransmogrifyItems& transmogrifyItems);
-
         // Miscellaneous
         void HandleSpellClick(WorldPackets::Spells::SpellClick& spellClick);
         void HandleMirrorImageDataRequest(WorldPackets::Spells::GetMirrorImageData& getMirrorImageData);
@@ -1640,12 +1560,6 @@ class TC_GAME_API WorldSession
         void HandleRequestCategoryCooldowns(WorldPackets::Spells::RequestCategoryCooldowns& requestCategoryCooldowns);
         void HandleCloseInteraction(WorldPackets::Misc::CloseInteraction& closeInteraction);
 
-        // Toys
-        void HandleAddToy(WorldPackets::Toy::AddToy& packet);
-        void HandleUseToy(WorldPackets::Toy::UseToy& packet);
-
-        void HandleMountSetFavorite(WorldPackets::Misc::MountSetFavorite& mountSetFavorite);
-
         // Scenes
         void HandleSceneTriggerEvent(WorldPackets::Scenes::SceneTriggerEvent& sceneTriggerEvent);
         void HandleScenePlaybackComplete(WorldPackets::Scenes::ScenePlaybackComplete& scenePlaybackComplete);
@@ -1658,15 +1572,6 @@ class TC_GAME_API WorldSession
         // Compact Unit Frames (4.x)
         void HandleSaveCUFProfiles(WorldPackets::Misc::SaveCUFProfiles& packet);
         void SendLoadCUFProfiles();
-
-        // Battle Pets
-        void HandleBattlePetRequestJournal(WorldPackets::BattlePet::BattlePetRequestJournal& battlePetRequestJournal);
-        void HandleBattlePetSetBattleSlot(WorldPackets::BattlePet::BattlePetSetBattleSlot& battlePetSetBattleSlot);
-        void HandleBattlePetModifyName(WorldPackets::BattlePet::BattlePetModifyName& battlePetModifyName);
-        void HandleBattlePetDeletePet(WorldPackets::BattlePet::BattlePetDeletePet& battlePetDeletePet);
-        void HandleBattlePetSetFlags(WorldPackets::BattlePet::BattlePetSetFlags& battlePetSetFlags);
-        void HandleBattlePetSummon(WorldPackets::BattlePet::BattlePetSummon& battlePetSummon);
-        void HandleCageBattlePet(WorldPackets::BattlePet::CageBattlePet& cageBattlePet);
 
         // Warden
         void HandleWardenData(WorldPackets::Warden::WardenData& packet);
@@ -1686,14 +1591,6 @@ class TC_GAME_API WorldSession
         std::unordered_map<uint32, uint8> const& GetRealmCharacterCounts() const { return _realmCharacterCounts; }
 
         void HandleQueryRealmName(WorldPackets::Query::QueryRealmName& queryRealmName);
-
-        // Artifact
-        void HandleArtifactAddPower(WorldPackets::Artifact::ArtifactAddPower& artifactAddPower);
-        void HandleArtifactSetAppearance(WorldPackets::Artifact::ArtifactSetAppearance& artifactSetAppearance);
-        void HandleConfirmArtifactRespec(WorldPackets::Artifact::ConfirmArtifactRespec& confirmArtifactRespec);
-
-        // Scenario
-        void HandleQueryScenarioPOI(WorldPackets::Scenario::QueryScenarioPOI& queryScenarioPOI);
 
         union ConnectToKey
         {
@@ -1810,10 +1707,6 @@ class TC_GAME_API WorldSession
         uint32 expireTime;
         bool forceExit;
         ObjectGuid m_currentBankerGUID;
-
-        std::unique_ptr<BattlePetMgr> _battlePetMgr;
-
-        std::unique_ptr<CollectionMgr> _collectionMgr;
 
         ConnectToKey _instanceConnectKey;
 

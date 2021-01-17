@@ -420,10 +420,8 @@ bool PlayerAI::IsPlayerHealer(Player const* who)
         case CLASS_WARRIOR:
         case CLASS_HUNTER:
         case CLASS_ROGUE:
-        case CLASS_DEATH_KNIGHT:
         case CLASS_MAGE:
         case CLASS_WARLOCK:
-        case CLASS_DEMON_HUNTER:
         default:
             return false;
         case CLASS_PALADIN:
@@ -432,8 +430,6 @@ bool PlayerAI::IsPlayerHealer(Player const* who)
             return who->GetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID) == TALENT_SPEC_PRIEST_DISCIPLINE || who->GetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID) == TALENT_SPEC_PRIEST_HOLY;
         case CLASS_SHAMAN:
             return who->GetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID) == TALENT_SPEC_SHAMAN_RESTORATION;
-        case CLASS_MONK:
-            return who->GetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID) == TALENT_SPEC_MONK_MISTWEAVER;
         case CLASS_DRUID:
             return who->GetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID) == TALENT_SPEC_DRUID_RESTORATION;
     }
@@ -449,7 +445,6 @@ bool PlayerAI::IsPlayerRangedAttacker(Player const* who)
         case CLASS_WARRIOR:
         case CLASS_PALADIN:
         case CLASS_ROGUE:
-        case CLASS_DEATH_KNIGHT:
         default:
             return false;
         case CLASS_MAGE:

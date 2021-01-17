@@ -29,8 +29,6 @@
 #include "AuthenticationPackets.h"
 #include "BattlegroundMgr.h"
 #include "BattlenetRpcErrorCodes.h"
-#include "BattlePetMgr.h"
-#include "BlackMarketMgr.h"
 #include "CalendarMgr.h"
 #include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
@@ -1919,15 +1917,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Auctions...");
     sAuctionMgr->LoadAuctions();
 
-    if (m_bool_configs[CONFIG_BLACKMARKET_ENABLED])
-    {
-        TC_LOG_INFO("server.loading", "Loading Black Market Templates...");
-        sBlackMarketMgr->LoadTemplates();
-
-        TC_LOG_INFO("server.loading", "Loading Black Market Auctions...");
-        sBlackMarketMgr->LoadAuctions();
-    }
-
     TC_LOG_INFO("server.loading", "Loading Guilds...");
     sGuildMgr->LoadGuilds();
 
@@ -1997,9 +1986,6 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading faction change title pairs...");
     sObjectMgr->LoadFactionChangeTitles();
-
-    TC_LOG_INFO("server.loading", "Loading mount definitions...");
-    CollectionMgr::LoadMountDefinitions();
 
     TC_LOG_INFO("server.loading", "Loading GM bugs...");
     sSupportMgr->LoadBugTickets();
@@ -2170,10 +2156,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading realm names...");
     sObjectMgr->LoadRealmNames();
 
-    TC_LOG_INFO("server.loading", "Loading battle pets info...");
-    BattlePetMgr::Initialize();
-
-
     // Preload all cells, if required for the base maps
     if (sWorld->getBoolConfig(CONFIG_BASEMAP_LOAD_GRIDS))
     {
@@ -2324,25 +2306,6 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_AUCTIONS_PENDING].Reset();
 
         sAuctionMgr->UpdatePendingAuctions();
-    }
-
-    if (m_timers[WUPDATE_BLACKMARKET].Passed())
-    {
-        m_timers[WUPDATE_BLACKMARKET].Reset();
-
-        ///- Update blackmarket, refresh auctions if necessary
-        if ((blackmarket_timer *  m_timers[WUPDATE_BLACKMARKET].GetInterval() >=
-            getIntConfig(CONFIG_BLACKMARKET_UPDATE_PERIOD) * HOUR * IN_MILLISECONDS)
-            || !blackmarket_timer)
-        {
-            sBlackMarketMgr->RefreshAuctions();
-            blackmarket_timer = 1; // timer is 0 on startup
-        }
-        else
-        {
-            ++blackmarket_timer;
-            sBlackMarketMgr->Update();
-        }
     }
 
     /// <li> Handle AHBot operations

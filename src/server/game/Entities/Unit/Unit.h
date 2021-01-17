@@ -306,31 +306,19 @@ enum TriggerCastFlags : uint32
 
 enum UnitMods
 {
-    UNIT_MOD_STAT_STRENGTH,                                 // UNIT_MOD_STAT_STRENGTH..UNIT_MOD_STAT_INTELLECT must be in existed order, it's accessed by index values of Stats enum.
+    UNIT_MOD_STAT_STRENGTH,                                 // UNIT_MOD_STAT_STRENGTH..UNIT_MOD_STAT_SPIRIT must be in existing order, it's accessed by index values of Stats enum.
     UNIT_MOD_STAT_AGILITY,
     UNIT_MOD_STAT_STAMINA,
     UNIT_MOD_STAT_INTELLECT,
+    UNIT_MOD_STAT_SPIRIT,
     UNIT_MOD_HEALTH,
-    UNIT_MOD_MANA,                                          // UNIT_MOD_MANA..UNIT_MOD_PAIN must be listed in existing order, it is accessed by index values of Powers enum.
+    UNIT_MOD_MANA,                                          // UNIT_MOD_MANA..UNIT_MOD_HAPPINESS must be in existing order, it's accessed by index values of Powers enum.
     UNIT_MOD_RAGE,
     UNIT_MOD_FOCUS,
     UNIT_MOD_ENERGY,
     UNIT_MOD_COMBO_POINTS,
-    UNIT_MOD_RUNES,
-    UNIT_MOD_RUNIC_POWER,
-    UNIT_MOD_SOUL_SHARDS,
-    UNIT_MOD_LUNAR_POWER,
-    UNIT_MOD_HOLY_POWER,
-    UNIT_MOD_ALTERNATE,
-    UNIT_MOD_MAELSTROM,
-    UNIT_MOD_CHI,
-    UNIT_MOD_INSANITY,
-    UNIT_MOD_BURNING_EMBERS,
-    UNIT_MOD_DEMONIC_FURY,
-    UNIT_MOD_ARCANE_CHARGES,
-    UNIT_MOD_FURY,
-    UNIT_MOD_PAIN,
-    UNIT_MOD_ARMOR,                                         // UNIT_MOD_ARMOR..UNIT_MOD_RESISTANCE_ARCANE must be in existed order, it's accessed by index values of SpellSchools enum.
+    UNIT_MOD_HAPPINESS,
+    UNIT_MOD_ARMOR,                                         // UNIT_MOD_ARMOR..UNIT_MOD_RESISTANCE_ARCANE must be in existing order, it's accessed by index values of SpellSchools enum.
     UNIT_MOD_RESISTANCE_HOLY,
     UNIT_MOD_RESISTANCE_FIRE,
     UNIT_MOD_RESISTANCE_NATURE,
@@ -345,11 +333,11 @@ enum UnitMods
     UNIT_MOD_END,
     // synonyms
     UNIT_MOD_STAT_START = UNIT_MOD_STAT_STRENGTH,
-    UNIT_MOD_STAT_END = UNIT_MOD_STAT_INTELLECT + 1,
+    UNIT_MOD_STAT_END = UNIT_MOD_STAT_SPIRIT + 1,
     UNIT_MOD_RESISTANCE_START = UNIT_MOD_ARMOR,
     UNIT_MOD_RESISTANCE_END = UNIT_MOD_RESISTANCE_ARCANE + 1,
     UNIT_MOD_POWER_START = UNIT_MOD_MANA,
-    UNIT_MOD_POWER_END = UNIT_MOD_PAIN + 1
+    UNIT_MOD_POWER_END = UNIT_MOD_HAPPINESS + 1
 };
 
 static_assert(UNIT_MOD_POWER_END - UNIT_MOD_POWER_START == MAX_POWERS, "UnitMods powers section does not match Powers enum!");
@@ -1065,10 +1053,10 @@ class TC_GAME_API Unit : public WorldObject
         uint64 CountPctFromMaxHealth(int32 pct) const { return CalculatePct(GetMaxHealth(), pct); }
         uint64 CountPctFromCurHealth(int32 pct) const { return CalculatePct(GetHealth(), pct); }
 
-        void SetHealth(uint64 val);
-        void SetMaxHealth(uint64 val);
+        void SetHealth(int32 val);
+        void SetMaxHealth(int32 val);
         inline void SetFullHealth() { SetHealth(GetMaxHealth()); }
-        int64 ModifyHealth(int64 val);
+        int32 ModifyHealth(int32 val);
         int64 GetHealthGain(int64 dVal);
 
         virtual float GetHealthMultiplierForTarget(WorldObject const* /*target*/) const { return 1.0f; }
@@ -1078,9 +1066,9 @@ class TC_GAME_API Unit : public WorldObject
         Powers GetPowerType() const { return Powers(GetUInt32Value(UNIT_FIELD_DISPLAY_POWER)); }
         void SetPowerType(Powers power);
         void UpdateDisplayPower();
-        int32 GetPower(Powers power) const;
-        int32 GetMinPower(Powers power) const { return power == POWER_LUNAR_POWER ? -100 : 0; }
-        int32 GetMaxPower(Powers power) const;
+        int32 GetPower(Powers power)  const { return GetUInt32Value(UNIT_FIELD_POWER + power); }
+        int32 GetMinPower(Powers power) const { return 0; }
+        int32 GetMaxPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_MAXPOWER + power); }
         float GetPowerPct(Powers power) const { return GetMaxPower(power) ? 100.f * GetPower(power) / GetMaxPower(power) : 0.0f; }
         int32 CountPctFromMaxPower(Powers power, int32 pct) const { return CalculatePct(GetMaxPower(power), pct); }
         void SetPower(Powers power, int32 val);
@@ -1634,7 +1622,6 @@ class TC_GAME_API Unit : public WorldObject
         virtual void UpdateArmor() = 0;
         virtual void UpdateMaxHealth() = 0;
         virtual void UpdateMaxPower(Powers power) = 0;
-        virtual uint32 GetPowerIndex(Powers power) const = 0;
         virtual void UpdateAttackPowerAndDamage(bool ranged = false) = 0;
         virtual void UpdateDamagePhysical(WeaponAttackType attType);
         float GetTotalAttackPowerValue(WeaponAttackType attType) const;

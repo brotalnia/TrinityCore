@@ -19,7 +19,6 @@
 #define MiscPackets_h__
 
 #include "Packet.h"
-#include "CollectionMgr.h"
 #include "CUFProfile.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
@@ -777,18 +776,6 @@ namespace WorldPackets
             bool EnablePVP = false;
         };
 
-        class AccountHeirloomUpdate final : public ServerPacket
-        {
-        public:
-            AccountHeirloomUpdate() : ServerPacket(SMSG_ACCOUNT_HEIRLOOM_UPDATE) { }
-
-            WorldPacket const* Write() override;
-
-            bool IsFullUpdate = false;
-            std::map<uint32, HeirloomData> const* Heirlooms = nullptr;
-            int32 Unk = 0;
-        };
-
         class MountSpecial final : public ClientPacket
         {
         public:
@@ -853,28 +840,6 @@ namespace WorldPackets
             GameError Error;
             Optional<int32> Arg;
             Optional<int32> Arg2;
-        };
-
-        class AccountMountUpdate final : public ServerPacket
-        {
-        public:
-            AccountMountUpdate() : ServerPacket(SMSG_ACCOUNT_MOUNT_UPDATE) { }
-
-            WorldPacket const* Write() override;
-
-            bool IsFullUpdate = false;
-            MountContainer const* Mounts = nullptr;
-        };
-
-        class MountSetFavorite final : public ClientPacket
-        {
-        public:
-            MountSetFavorite(WorldPacket&& packet) : ClientPacket(CMSG_MOUNT_SET_FAVORITE, std::move(packet)) { }
-
-            void Read() override;
-
-            uint32 MountSpellID = 0;
-            bool IsFavorite = false;
         };
 
         class CloseInteraction final : public ClientPacket

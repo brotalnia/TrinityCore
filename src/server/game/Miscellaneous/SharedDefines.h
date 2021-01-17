@@ -141,37 +141,10 @@ enum Races
     RACE_GNOME                  = 7,
     RACE_TROLL                  = 8,
     RACE_GOBLIN                 = 9,
-    RACE_BLOODELF               = 10,
-    RACE_DRAENEI                = 11,
-    //RACE_FEL_ORC            = 12,
-    //RACE_NAGA               = 13,
-    //RACE_BROKEN             = 14,
-    //RACE_SKELETON           = 15,
-    //RACE_VRYKUL             = 16,
-    //RACE_TUSKARR            = 17,
-    //RACE_FOREST_TROLL       = 18,
-    //RACE_TAUNKA             = 19,
-    //RACE_NORTHREND_SKELETON = 20,
-    //RACE_ICE_TROLL          = 21,
-    RACE_WORGEN                 = 22,
-    //RACE_GILNEAN            = 23,
-    RACE_PANDAREN_NEUTRAL       = 24,
-    RACE_PANDAREN_ALLIANCE      = 25,
-    RACE_PANDAREN_HORDE         = 26,
-    RACE_NIGHTBORNE             = 27,
-    RACE_HIGHMOUNTAIN_TAUREN    = 28,
-    RACE_VOID_ELF               = 29,
-    RACE_LIGHTFORGED_DRAENEI    = 30,
-    //RACE_ZANDALARI_TROLL    = 31,
-    //RACE_KUL_TIRAN          = 32,
-    //RACE_THIN_HUMAN         = 33,
-    RACE_DARK_IRON_DWARF        = 34,
-    //RACE_VULPERA            = 35,
-    RACE_MAGHAR_ORC             = 36
 };
 
 // max+1 for player race
-#define MAX_RACES         37
+#define MAX_RACES         11
 
 #define RACEMASK_ALL_PLAYABLE                     \
     ((UI64LIT(1)<<(RACE_HUMAN-1))               | \
@@ -181,20 +154,7 @@ enum Races
      (UI64LIT(1)<<(RACE_UNDEAD_PLAYER-1))       | \
      (UI64LIT(1)<<(RACE_TAUREN-1))              | \
      (UI64LIT(1)<<(RACE_GNOME-1))               | \
-     (UI64LIT(1)<<(RACE_TROLL-1))               | \
-     (UI64LIT(1)<<(RACE_BLOODELF-1))            | \
-     (UI64LIT(1)<<(RACE_DRAENEI-1))             | \
-     (UI64LIT(1)<<(RACE_GOBLIN-1))              | \
-     (UI64LIT(1)<<(RACE_WORGEN-1))              | \
-     (UI64LIT(1)<<(RACE_PANDAREN_NEUTRAL-1))    | \
-     (UI64LIT(1)<<(RACE_PANDAREN_ALLIANCE-1))   | \
-     (UI64LIT(1)<<(RACE_PANDAREN_HORDE-1))      | \
-     (UI64LIT(1)<<(RACE_NIGHTBORNE-1))          | \
-     (UI64LIT(1)<<(RACE_HIGHMOUNTAIN_TAUREN-1)) | \
-     (UI64LIT(1)<<(RACE_VOID_ELF-1))            | \
-     (UI64LIT(1)<<(RACE_LIGHTFORGED_DRAENEI-1)) | \
-     (UI64LIT(1)<<(RACE_DARK_IRON_DWARF-1))     | \
-     (UI64LIT(1)<<(RACE_MAGHAR_ORC-1)))
+     (UI64LIT(1)<<(RACE_TROLL-1)))
 
 #define RACEMASK_NEUTRAL (UI64LIT(1)<<(RACE_PANDAREN_NEUTRAL-1))
 
@@ -202,13 +162,7 @@ enum Races
     ((UI64LIT(1)<<(RACE_HUMAN-1))               | \
      (UI64LIT(1)<<(RACE_DWARF-1))               | \
      (UI64LIT(1)<<(RACE_NIGHTELF-1))            | \
-     (UI64LIT(1)<<(RACE_GNOME-1))               | \
-     (UI64LIT(1)<<(RACE_DRAENEI-1))             | \
-     (UI64LIT(1)<<(RACE_WORGEN-1))              | \
-     (UI64LIT(1)<<(RACE_PANDAREN_ALLIANCE-1))   | \
-     (UI64LIT(1)<<(RACE_VOID_ELF-1))            | \
-     (UI64LIT(1)<<(RACE_LIGHTFORGED_DRAENEI-1)) | \
-     (UI64LIT(1)<<(RACE_DARK_IRON_DWARF-1)))
+     (UI64LIT(1)<<(RACE_GNOME-1)))
 
 #define RACEMASK_HORDE (RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE)
 
@@ -221,17 +175,14 @@ enum Classes : uint8
     CLASS_HUNTER        = 3,
     CLASS_ROGUE         = 4,
     CLASS_PRIEST        = 5,
-    CLASS_DEATH_KNIGHT  = 6,
     CLASS_SHAMAN        = 7,
     CLASS_MAGE          = 8,
     CLASS_WARLOCK       = 9,
-    CLASS_MONK          = 10,
     CLASS_DRUID         = 11,
-    CLASS_DEMON_HUNTER  = 12
 };
 
 // max+1 for player class
-#define MAX_CLASSES       13
+#define MAX_CLASSES       11
 
 #define CLASSMASK_ALL_PLAYABLE     \
     ((1<<(CLASS_WARRIOR-1))      | \
@@ -239,13 +190,10 @@ enum Classes : uint8
      (1<<(CLASS_HUNTER-1))       | \
      (1<<(CLASS_ROGUE-1))        | \
      (1<<(CLASS_PRIEST-1))       | \
-     (1<<(CLASS_DEATH_KNIGHT-1)) | \
      (1<<(CLASS_SHAMAN-1))       | \
      (1<<(CLASS_MAGE-1))         | \
      (1<<(CLASS_WARLOCK-1))      | \
-     (1<<(CLASS_MONK-1))         | \
-     (1<<(CLASS_DRUID-1))        | \
-     (1<<(CLASS_DEMON_HUNTER-1)))
+     (1<<(CLASS_DRUID-1)))
 
 // valid classes for creature_template.unit_class
 enum UnitClass
@@ -296,29 +244,17 @@ enum Stats : uint16
 
 #define MAX_STATS                        4
 
+// PowerType.db2 (1.13.6.36935)
 enum Powers : int8
 {
     POWER_MANA                          = 0,
     POWER_RAGE                          = 1,
     POWER_FOCUS                         = 2,
     POWER_ENERGY                        = 3,
-    POWER_COMBO_POINTS                  = 4,
-    POWER_RUNES                         = 5,
-    POWER_RUNIC_POWER                   = 6,
-    POWER_SOUL_SHARDS                   = 7,
-    POWER_LUNAR_POWER                   = 8,
-    POWER_HOLY_POWER                    = 9,
-    POWER_ALTERNATE_POWER               = 10,           // Used in some quests
-    POWER_MAELSTROM                     = 11,
-    POWER_CHI                           = 12,
-    POWER_INSANITY                      = 13,
-    POWER_BURNING_EMBERS                = 14,
-    POWER_DEMONIC_FURY                  = 15,
-    POWER_ARCANE_CHARGES                = 16,
-    POWER_FURY                          = 17,
-    POWER_PAIN                          = 18,
-    MAX_POWERS                          = 19,
-    POWER_ALL                           = 127,          // default for class?
+    POWER_HAPINESS                      = 4,
+    POWER_COMBO_POINTS                  = 14,
+    MAX_POWERS                          = 6,
+    POWER_ALL                           = 25,           // default for class? (Idk?)
     POWER_HEALTH                        = -2            // (-2 as signed value)
 };
 
@@ -1040,21 +976,6 @@ enum Language
     LANG_GNOMISH           = 13,
     LANG_TROLL             = 14,
     LANG_GUTTERSPEAK       = 33,
-    LANG_DRAENEI           = 35,
-    LANG_ZOMBIE            = 36,
-    LANG_GNOMISH_BINARY    = 37,
-    LANG_GOBLIN_BINARY     = 38,
-    LANG_WORGEN            = 39,
-    LANG_GOBLIN            = 40,
-    LANG_PANDAREN_NEUTRAL  = 42,
-    LANG_PANDAREN_ALLIANCE = 43,
-    LANG_PANDAREN_HORDE    = 44,
-    LANG_SPRITE            = 168,
-    LANG_SHATH_YAR         = 178,
-    LANG_NERGLISH          = 179,
-    LANG_MOONKIN           = 180,
-    LANG_SHALASSIAN        = 181,
-    LANG_THALASSIAN_2      = 182,
     LANG_ADDON             = 183,
     LANG_ADDON_LOGGED      = 184
 };
@@ -3985,56 +3906,6 @@ enum CreatureFamily
     CREATURE_FAMILY_BIRD_OF_PREY        = 26,
     CREATURE_FAMILY_WIND_SERPENT        = 27,
     CREATURE_FAMILY_REMOTE_CONTROL      = 28,
-    CREATURE_FAMILY_FELGUARD            = 29,
-    CREATURE_FAMILY_DRAGONHAWK          = 30,
-    CREATURE_FAMILY_RAVAGER             = 31,
-    CREATURE_FAMILY_WARP_STALKER        = 32,
-    CREATURE_FAMILY_SPOREBAT            = 33,
-    CREATURE_FAMILY_NETHER_RAY          = 34,
-    CREATURE_FAMILY_SERPENT             = 35,
-    CREATURE_FAMILY_MOTH                = 37,
-    CREATURE_FAMILY_CHIMAERA            = 38,
-    CREATURE_FAMILY_DEVILSAUR           = 39,
-    CREATURE_FAMILY_GHOUL               = 40,
-    CREATURE_FAMILY_SILITHID            = 41,
-    CREATURE_FAMILY_WORM                = 42,
-    CREATURE_FAMILY_RHINO               = 43,
-    CREATURE_FAMILY_WASP                = 44,
-    CREATURE_FAMILY_CORE_HOUND          = 45,
-    CREATURE_FAMILY_SPIRIT_BEAST        = 46,
-    CREATURE_FAMILY_WATER_ELEMENTAL     = 49,
-    CREATURE_FAMILY_FOX                 = 50,
-    CREATURE_FAMILY_MONKEY              = 51,
-    CREATURE_FAMILY_DOG                 = 52,
-    CREATURE_FAMILY_BEETLE              = 53,
-    CREATURE_FAMILY_SHALE_SPIDER        = 55,
-    CREATURE_FAMILY_ZOMBIE              = 56,
-    CREATURE_FAMILY_BEETLE_OLD          = 57,
-    CREATURE_FAMILY_SILITHID2           = 59,
-    CREATURE_FAMILY_WASP2               = 66,
-    CREATURE_FAMILY_HYDRA               = 68,
-    CREATURE_FAMILY_FELIMP              = 100,
-    CREATURE_FAMILY_VOIDLORD            = 101,
-    CREATURE_FAMILY_SHIVARA             = 102,
-    CREATURE_FAMILY_OBSERVER            = 103,
-    CREATURE_FAMILY_WRATHGUARD          = 104,
-    CREATURE_FAMILY_INFERNAL            = 108,
-    CREATURE_FAMILY_FIREELEMENTAL       = 116,
-    CREATURE_FAMILY_EARTHELEMENTAL      = 117,
-    CREATURE_FAMILY_CRANE               = 125,
-    CREATURE_FAMILY_WATERSTRIDER        = 126,
-    CREATURE_FAMILY_PORCUPINE           = 127,
-    CREATURE_FAMILY_QUILEN              = 128,
-    CREATURE_FAMILY_GOAT                = 129,
-    CREATURE_FAMILY_BASILISK            = 130,
-    CREATURE_FAMILY_DIREHORN            = 138,
-    CREATURE_FAMILY_STORMELEMENTAL      = 145,
-    CREATURE_FAMILY_MTWATERELEMENTAL    = 146,
-    CREATURE_FAMILY_TORRORGUARD         = 147,
-    CREATURE_FAMILY_ABYSSAL             = 148,
-    CREATURE_FAMILY_RYLAK               = 149,
-    CREATURE_FAMILY_RIVERBEAST          = 150,
-    CREATURE_FAMILY_STAG                = 151
 };
 
 enum CreatureTypeFlags
@@ -4217,32 +4088,6 @@ enum QuestSort
     QUEST_SORT_REPUTATION                 = 367,
     QUEST_SORT_INVASION                   = 368,
     QUEST_SORT_MIDSUMMER                  = 369,
-    QUEST_SORT_BREWFEST                   = 370,
-    QUEST_SORT_INSCRIPTION                = 371,
-    QUEST_SORT_DEATH_KNIGHT               = 372,
-    QUEST_SORT_JEWELCRAFTING              = 373,
-    QUEST_SORT_NOBLEGARDEN                = 374,
-    QUEST_SORT_PILGRIMS_BOUNTY            = 375,
-    QUEST_SORT_LOVE_IS_IN_THE_AIR         = 376,
-    QUEST_SORT_ARCHAEOLOGY                = 377,
-    QUEST_SORT_CHILDRENS_WEEK             = 378,
-    QUEST_SORT_FIRELANDS_INVASION         = 379,
-    QUEST_SORT_THE_ZANDALARI              = 380,
-    QUEST_SORT_ELEMENTAL_BONDS            = 381,
-    QUEST_SORT_PANDAREN_BREWMASTER        = 391,
-    QUEST_SORT_SCENARIO                   = 392,
-    QUEST_SORT_BATTLE_PETS                = 394,
-    QUEST_SORT_MONK                       = 395,
-    QUEST_SORT_LANDFALL                   = 396,
-    QUEST_SORT_PANDAREN_CAMPAIGN          = 397,
-    QUEST_SORT_RIDING                     = 398,
-    QUEST_SORT_BRAWLERS_GUILD             = 399,
-    QUEST_SORT_PROVING_GROUNDS            = 400,
-    QUEST_SORT_GARRISON_CAMPAIGN          = 401,
-    QUEST_SORT_ASSAULT_ON_THE_DARK_PORTAL = 402,
-    QUEST_SORT_GARRISON_SUPPORT           = 403,
-    QUEST_SORT_LOGGING                    = 404,
-    QUEST_SORT_PICKPOCKETING              = 405
 };
 
 inline uint8 ClassByQuestSort(int32 QuestSort)
@@ -4258,7 +4103,6 @@ inline uint8 ClassByQuestSort(int32 QuestSort)
         case QUEST_SORT_HUNTER:         return CLASS_HUNTER;
         case QUEST_SORT_PRIEST:         return CLASS_PRIEST;
         case QUEST_SORT_DRUID:          return CLASS_DRUID;
-        case QUEST_SORT_DEATH_KNIGHT:   return CLASS_DEATH_KNIGHT;
     }
     return 0;
 }
@@ -4360,216 +4204,6 @@ enum SkillType
     SKILL_JEWELCRAFTING                  = 755,
     SKILL_RACIAL_BLOOD_ELF               = 756,
     SKILL_PET_EVENT_REMOTE_CONTROL       = 758,
-    SKILL_LANGUAGE_DRAENEI               = 759,
-    SKILL_RACIAL_DRAENEI                 = 760,
-    SKILL_PET_FELGUARD                   = 761,
-    SKILL_RIDING                         = 762,
-    SKILL_PET_DRAGONHAWK                 = 763,
-    SKILL_PET_NETHER_RAY                 = 764,
-    SKILL_PET_SPOREBAT                   = 765,
-    SKILL_PET_WARP_STALKER               = 766,
-    SKILL_PET_RAVAGER                    = 767,
-    SKILL_PET_SERPENT                    = 768,
-    SKILL_INTERNAL                       = 769,
-    SKILL_INSCRIPTION                    = 773,
-    SKILL_PET_MOTH                       = 775,
-    SKILL_MOUNTS                         = 777,
-    SKILL_COMPANIONS                     = 778,
-    SKILL_PET_EXOTIC_CHIMAERA            = 780,
-    SKILL_PET_EXOTIC_DEVILSAUR           = 781,
-    SKILL_PET_GHOUL                      = 782,
-    SKILL_PET_EXOTIC_SILITHID            = 783,
-    SKILL_PET_EXOTIC_WORM                = 784,
-    SKILL_PET_WASP                       = 785,
-    SKILL_PET_EXOTIC_CLEFTHOOF           = 786,
-    SKILL_PET_EXOTIC_CORE_HOUND          = 787,
-    SKILL_PET_EXOTIC_SPIRIT_BEAST        = 788,
-    SKILL_RACIAL_WORGEN                  = 789,
-    SKILL_RACIAL_GOBLIN                  = 790,
-    SKILL_LANGUAGE_GILNEAN               = 791,
-    SKILL_LANGUAGE_GOBLIN                = 792,
-    SKILL_ARCHAEOLOGY                    = 794,
-    SKILL_HUNTER                         = 795,
-    SKILL_DEATH_KNIGHT                   = 796,
-    SKILL_DRUID                          = 798,
-    SKILL_PALADIN                        = 800,
-    SKILL_PRIEST                         = 804,
-    SKILL_PET_WATER_ELEMENTAL            = 805,
-    SKILL_PET_FOX                        = 808,
-    SKILL_ALL_GLYPHS                     = 810,
-    SKILL_PET_DOG                        = 811,
-    SKILL_PET_MONKEY                     = 815,
-    SKILL_PET_EXOTIC_SHALE_SPIDER        = 817,
-    SKILL_BEETLE                         = 818,
-    SKILL_ALL_GUILD_PERKS                = 821,
-    SKILL_PET_HYDRA                      = 824,
-    SKILL_MONK                           = 829,
-    SKILL_WARRIOR                        = 840,
-    SKILL_WARLOCK                        = 849,
-    SKILL_RACIAL_PANDAREN                = 899,
-    SKILL_MAGE                           = 904,
-    SKILL_LANGUAGE_PANDAREN_NEUTRAL      = 905,
-    SKILL_ROGUE                          = 921,
-    SKILL_SHAMAN                         = 924,
-    SKILL_FEL_IMP                        = 927,
-    SKILL_VOIDLORD                       = 928,
-    SKILL_SHIVARRA                       = 929,
-    SKILL_OBSERVER                       = 930,
-    SKILL_WRATHGUARD                     = 931,
-    SKILL_ALL_SPECIALIZATIONS            = 934,
-    SKILL_RUNEFORGING                    = 960,
-    SKILL_PET_PRIMAL_FIRE_ELEMENTAL      = 962,
-    SKILL_PET_PRIMAL_EARTH_ELEMENTAL     = 963,
-    SKILL_WAY_OF_THE_GRILL               = 975,
-    SKILL_WAY_OF_THE_WOK                 = 976,
-    SKILL_WAY_OF_THE_POT                 = 977,
-    SKILL_WAY_OF_THE_STEAMER             = 978,
-    SKILL_WAY_OF_THE_OVEN                = 979,
-    SKILL_WAY_OF_THE_BREW                = 980,
-    SKILL_APPRENTICE_COOKING             = 981,
-    SKILL_JOURNEYMAN_COOKBOOK            = 982,
-    SKILL_PET_RODENT                     = 983,
-    SKILL_PET_CRANE                      = 984,
-    SKILL_PET_WATER_STRIDER              = 985,
-    SKILL_PET_EXOTIC_QUILEN              = 986,
-    SKILL_PET_GOAT                       = 987,
-    SKILL_PET_BASILISK                   = 988,
-    SKILL_NO_PLAYERS                     = 999,
-    SKILL_PET_DIREHORN                   = 1305,
-    SKILL_PET_PRIMAL_STORM_ELEMENTAL     = 1748,
-    SKILL_PET_WATER_ELEMENTAL_MINOR_TALENT_VERSION = 1777,
-    SKILL_PET_RIVERBEAST                 = 1819,
-    SKILL_UNUSED                         = 1830,
-    SKILL_DEMON_HUNTER                   = 1848,
-    SKILL_LOGGING                        = 1945,
-    SKILL_PET_TERRORGUARD                = 1981,
-    SKILL_PET_ABYSSAL                    = 1982,
-    SKILL_PET_STAG                       = 1993,
-    SKILL_TRADING_POST                   = 2000,
-    SKILL_WARGLAIVES                     = 2152,
-    SKILL_PET_MECHANICAL                 = 2189,
-    SKILL_PET_ABOMINATION                = 2216,
-    SKILL_PET_OXEN                       = 2279,
-    SKILL_PET_SCALEHIDE                  = 2280,
-    SKILL_PET_FEATHERMANE                = 2361,
-    SKILL_RACIAL_NIGHTBORNE              = 2419,
-    SKILL_RACIAL_HIGHMOUNTAIN_TAUREN     = 2420,
-    SKILL_RACIAL_LIGHTFORGED_DRAENEI     = 2421,
-    SKILL_RACIAL_VOID_ELF                = 2423,
-    SKILL_KUL_TIRAN_BLACKSMITHING        = 2437,
-    SKILL_LEGION_BLACKSMITHING           = 2454,
-    SKILL_LANGUAGE_SHALASSIAN            = 2464,
-    SKILL_LANGUAGE_THALASSIAN_2          = 2465,
-    SKILL_DRAENOR_BLACKSMITHING          = 2472,
-    SKILL_PANDARIA_BLACKSMITHING         = 2473,
-    SKILL_CATACLYSM_BLACKSMITHING        = 2474,
-    SKILL_NORTHREND_BLACKSMITHING        = 2475,
-    SKILL_OUTLAND_BLACKSMITHING          = 2476,
-    SKILL_BLACKSMITHING_2                = 2477,
-    SKILL_KUL_TIRAN_ALCHEMY              = 2478,
-    SKILL_LEGION_ALCHEMY                 = 2479,
-    SKILL_DRAENOR_ALCHEMY                = 2480,
-    SKILL_PANDARIA_ALCHEMY               = 2481,
-    SKILL_CATACLYSM_ALCHEMY              = 2482,
-    SKILL_NORTHREND_ALCHEMY              = 2483,
-    SKILL_OUTLAND_ALCHEMY                = 2484,
-    SKILL_ALCHEMY_2                      = 2485,
-    SKILL_KUL_TIRAN_ENCHANTING           = 2486,
-    SKILL_LEGION_ENCHANTING              = 2487,
-    SKILL_DRAENOR_ENCHANTING             = 2488,
-    SKILL_PANDARIA_ENCHANTING            = 2489,
-    SKILL_CATACLYSM_ENCHANTING           = 2491,
-    SKILL_NORTHREND_ENCHANTING           = 2492,
-    SKILL_OUTLAND_ENCHANTING             = 2493,
-    SKILL_ENCHANTING_2                   = 2494,
-    SKILL_KUL_TIRAN_ENGINEERING          = 2499,
-    SKILL_LEGION_ENGINEERING             = 2500,
-    SKILL_DRAENOR_ENGINEERING            = 2501,
-    SKILL_PANDARIA_ENGINEERING           = 2502,
-    SKILL_CATACLYSM_ENGINEERING          = 2503,
-    SKILL_NORTHREND_ENGINEERING          = 2504,
-    SKILL_OUTLAND_ENGINEERING            = 2505,
-    SKILL_ENGINEERING_2                  = 2506,
-    SKILL_KUL_TIRAN_INSCRIPTION          = 2507,
-    SKILL_LEGION_INSCRIPTION             = 2508,
-    SKILL_DRAENOR_INSCRIPTION            = 2509,
-    SKILL_PANDARIA_INSCRIPTION           = 2510,
-    SKILL_CATACLYSM_INSCRIPTION          = 2511,
-    SKILL_NORTHREND_INSCRIPTION          = 2512,
-    SKILL_OUTLAND_INSCRIPTION            = 2513,
-    SKILL_INSCRIPTION_2                  = 2514,
-    SKILL_KUL_TIRAN_JEWELCRAFTING        = 2517,
-    SKILL_LEGION_JEWELCRAFTING           = 2518,
-    SKILL_DRAENOR_JEWELCRAFTING          = 2519,
-    SKILL_PANDARIA_JEWELCRAFTING         = 2520,
-    SKILL_CATACLYSM_JEWELCRAFTING        = 2521,
-    SKILL_NORTHREND_JEWELCRAFTING        = 2522,
-    SKILL_OUTLAND_JEWELCRAFTING          = 2523,
-    SKILL_JEWELCRAFTING_2                = 2524,
-    SKILL_KUL_TIRAN_LEATHERWORKING       = 2525,
-    SKILL_LEGION_LEATHERWORKING          = 2526,
-    SKILL_DRAENOR_LEATHERWORKING         = 2527,
-    SKILL_PANDARIA_LEATHERWORKING        = 2528,
-    SKILL_CATACLYSM_LEATHERWORKING       = 2529,
-    SKILL_NORTHREND_LEATHERWORKING       = 2530,
-    SKILL_OUTLAND_LEATHERWORKING         = 2531,
-    SKILL_LEATHERWORKING_2               = 2532,
-    SKILL_KUL_TIRAN_TAILORING            = 2533,
-    SKILL_LEGION_TAILORING               = 2534,
-    SKILL_DRAENOR_TAILORING              = 2535,
-    SKILL_PANDARIA_TAILORING             = 2536,
-    SKILL_CATACLYSM_TAILORING            = 2537,
-    SKILL_NORTHREND_TAILORING            = 2538,
-    SKILL_OUTLAND_TAILORING              = 2539,
-    SKILL_TAILORING_2                    = 2540,
-    SKILL_KUL_TIRAN_COOKING              = 2541,
-    SKILL_LEGION_COOKING                 = 2542,
-    SKILL_DRAENOR_COOKING                = 2543,
-    SKILL_PANDARIA_COOKING               = 2544,
-    SKILL_CATACLYSM_COOKING              = 2545,
-    SKILL_NORTHREND_COOKING              = 2546,
-    SKILL_OUTLAND_COOKING                = 2547,
-    SKILL_COOKING_2                      = 2548,
-    SKILL_KUL_TIRAN_HERBALISM            = 2549,
-    SKILL_LEGION_HERBALISM               = 2550,
-    SKILL_DRAENOR_HERBALISM              = 2551,
-    SKILL_PANDARIA_HERBALISM             = 2552,
-    SKILL_CATACLYSM_HERBALISM            = 2553,
-    SKILL_NORTHREND_HERBALISM            = 2554,
-    SKILL_OUTLAND_HERBALISM              = 2555,
-    SKILL_HERBALISM_2                    = 2556,
-    SKILL_KUL_TIRAN_SKINNING             = 2557,
-    SKILL_LEGION_SKINNING                = 2558,
-    SKILL_DRAENOR_SKINNING               = 2559,
-    SKILL_PANDARIA_SKINNING              = 2560,
-    SKILL_CATACLYSM_SKINNING             = 2561,
-    SKILL_NORTHREND_SKINNING             = 2562,
-    SKILL_OUTLAND_SKINNING               = 2563,
-    SKILL_SKINNING_2                     = 2564,
-    SKILL_KUL_TIRAN_MINING               = 2565,
-    SKILL_LEGION_MINING                  = 2566,
-    SKILL_DRAENOR_MINING                 = 2567,
-    SKILL_PANDARIA_MINING                = 2568,
-    SKILL_CATACLYSM_MINING               = 2569,
-    SKILL_NORTHREND_MINING               = 2570,
-    SKILL_OUTLAND_MINING                 = 2571,
-    SKILL_MINING_2                       = 2572,
-    SKILL_KUL_TIRAN_FISHING              = 2585,
-    SKILL_LEGION_FISHING                 = 2586,
-    SKILL_DRAENOR_FISHING                = 2587,
-    SKILL_PANDARIA_FISHING               = 2588,
-    SKILL_CATACLYSM_FISHING              = 2589,
-    SKILL_NORTHREND_FISHING              = 2590,
-    SKILL_OUTLAND_FISHING                = 2591,
-    SKILL_FISHING_2                      = 2592,
-    SKILL_RACIAL_DARK_IRON_DWARF         = 2597,
-    SKILL_RACIAL_MAG_HAR_ORC             = 2598,
-    SKILL_PET_LIZARD                     = 2703,
-    SKILL_PET_HORSE                      = 2704,
-    SKILL_PET_EXOTIC_PTERRORDAX          = 2705,
-    SKILL_PET_TOAD                       = 2706,
-    SKILL_PET_EXOTIC_KROLUSK             = 2707,
-    SKILL_SECOND_PET_HUNTER              = 2716
 };
 
 inline SkillType SkillByLockType(LockType locktype)
@@ -4579,25 +4213,6 @@ inline SkillType SkillByLockType(LockType locktype)
         case LOCKTYPE_HERBALISM:   return SKILL_HERBALISM;
         case LOCKTYPE_MINING:      return SKILL_MINING;
         case LOCKTYPE_FISHING:     return SKILL_FISHING;
-        case LOCKTYPE_INSCRIPTION: return SKILL_INSCRIPTION;
-        case LOCKTYPE_ARCHAEOLOGY: return SKILL_ARCHAEOLOGY;
-        case LOCKTYPE_LUMBER_MILL: return SKILL_LOGGING;
-        case LOCKTYPE_CLASSIC_HERBALISM: return SKILL_HERBALISM_2;
-        case LOCKTYPE_OUTLAND_HERBALISM: return SKILL_OUTLAND_HERBALISM;
-        case LOCKTYPE_NORTHREND_HERBALISM: return SKILL_NORTHREND_HERBALISM;
-        case LOCKTYPE_CATACLYSM_HERBALISM: return SKILL_CATACLYSM_HERBALISM;
-        case LOCKTYPE_PANDARIA_HERBALISM: return SKILL_PANDARIA_HERBALISM;
-        case LOCKTYPE_DRAENOR_HERBALISM: return SKILL_DRAENOR_HERBALISM;
-        case LOCKTYPE_LEGION_HERBALISM: return SKILL_LEGION_HERBALISM;
-        case LOCKTYPE_KUL_TIRAN_HERBALISM: return SKILL_KUL_TIRAN_HERBALISM;
-        case LOCKTYPE_CLASSIC_MINING: return SKILL_MINING_2;
-        case LOCKTYPE_OUTLAND_MINING: return SKILL_OUTLAND_MINING;
-        case LOCKTYPE_NORTHREND_MINING: return SKILL_NORTHREND_MINING;
-        case LOCKTYPE_CATACLYSM_MINING: return SKILL_CATACLYSM_MINING;
-        case LOCKTYPE_PANDARIA_MINING: return SKILL_PANDARIA_MINING;
-        case LOCKTYPE_DRAENOR_MINING: return SKILL_DRAENOR_MINING;
-        case LOCKTYPE_LEGION_MINING: return SKILL_LEGION_MINING;
-        case LOCKTYPE_KUL_TIRAN_MINING: return SKILL_KUL_TIRAN_MINING;
         default: break;
     }
     return SKILL_NONE;
@@ -4615,9 +4230,6 @@ inline uint32 SkillByQuestSort(int32 QuestSort)
         case QUEST_SORT_ENGINEERING:    return SKILL_ENGINEERING;
         case QUEST_SORT_TAILORING:      return SKILL_TAILORING;
         case QUEST_SORT_COOKING:        return SKILL_COOKING;
-        case QUEST_SORT_JEWELCRAFTING:  return SKILL_JEWELCRAFTING;
-        case QUEST_SORT_INSCRIPTION:    return SKILL_INSCRIPTION;
-        case QUEST_SORT_ARCHAEOLOGY:    return SKILL_ARCHAEOLOGY;
     }
     return 0;
 }

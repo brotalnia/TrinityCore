@@ -926,7 +926,7 @@ void DB2Manager::LoadStores(std::string const& dataPath, uint32 defaultLocale)
     //         std::vector<SpellPowerEntry const*>& powers = _spellPowerDifficulties[power->SpellID][powerDifficulty->DifficultyID];
     //         if (powers.size() <= powerDifficulty->OrderIndex)
     //             powers.resize(powerDifficulty->OrderIndex + 1);
-    // 
+    //
     //         powers[powerDifficulty->OrderIndex] = power;
     //     }
     //     else
@@ -934,7 +934,7 @@ void DB2Manager::LoadStores(std::string const& dataPath, uint32 defaultLocale)
     //         std::vector<SpellPowerEntry const*>& powers = _spellPowers[power->SpellID];
     //         if (powers.size() <= power->OrderIndex)
     //             powers.resize(power->OrderIndex + 1);
-    // 
+    //
     //         powers[power->OrderIndex] = power;
     //     }
     // }
@@ -1987,17 +1987,7 @@ int32 DB2Manager::GetNumTalentsAtLevel(uint32 level, Classes playerClass)
         numTalentsAtLevel = sNumTalentsAtLevelStore.LookupEntry(sNumTalentsAtLevelStore.GetNumRows() - 1);
 
     if (numTalentsAtLevel)
-    {
-        switch (playerClass)
-        {
-        case CLASS_DEATH_KNIGHT:
-            return numTalentsAtLevel->NumTalentsDeathKnight;
-        case CLASS_DEMON_HUNTER:
-            return numTalentsAtLevel->NumTalentsDemonHunter;
-        default:
-            return numTalentsAtLevel->NumTalents;
-        }
-    }
+        return numTalentsAtLevel->NumTalents;
 
     return 0;
 }
@@ -2030,36 +2020,6 @@ PVPDifficultyEntry const* DB2Manager::GetBattlegroundBracketById(uint32 mapid, B
             return entry;
 
     return nullptr;
-}
-
-uint32 DB2Manager::GetRequiredLevelForPvpTalentSlot(uint8 slot, Classes class_) const
-{
-    ASSERT(slot < MAX_PVP_TALENT_SLOTS);
-    if (_pvpTalentSlotUnlock[slot])
-    {
-        switch (class_)
-        {
-        case CLASS_DEATH_KNIGHT:
-            return _pvpTalentSlotUnlock[slot]->DeathKnightLevelRequired;
-        case CLASS_DEMON_HUNTER:
-            return _pvpTalentSlotUnlock[slot]->DemonHunterLevelRequired;
-        default:
-            break;
-        }
-        return _pvpTalentSlotUnlock[slot]->LevelRequired;
-    }
-
-    return 0;
-}
-
-int32 DB2Manager::GetPvpTalentNumSlotsAtLevel(uint32 level, Classes class_) const
-{
-    int32 slots = 0;
-    for (uint8 slot = 0; slot < MAX_PVP_TALENT_SLOTS; ++slot)
-        if (level >= GetRequiredLevelForPvpTalentSlot(slot, class_))
-            ++slots;
-
-    return slots;
 }
 
 std::vector<QuestPackageItemEntry const*> const* DB2Manager::GetQuestPackageItems(uint32 questPackageID) const

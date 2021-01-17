@@ -585,26 +585,6 @@ void WorldPackets::Misc::SetPvP::Read()
     EnablePVP = _worldPacket.ReadBit();
 }
 
-WorldPacket const* WorldPackets::Misc::AccountHeirloomUpdate::Write()
-{
-    _worldPacket.WriteBit(IsFullUpdate);
-    _worldPacket.FlushBits();
-
-    _worldPacket << int32(Unk);
-
-    // both lists have to have the same size
-    _worldPacket << int32(Heirlooms->size());
-    _worldPacket << int32(Heirlooms->size());
-
-    for (auto const& item : *Heirlooms)
-        _worldPacket << uint32(item.first);
-
-    for (auto const& flags : *Heirlooms)
-        _worldPacket << uint32(flags.second.flags);
-
-    return &_worldPacket;
-}
-
 WorldPacket const* WorldPackets::Misc::SpecialMountAnim::Write()
 {
     _worldPacket << UnitGUID;
@@ -648,28 +628,6 @@ WorldPacket const* WorldPackets::Misc::DisplayGameError::Write()
         _worldPacket << int32(*Arg2);
 
     return &_worldPacket;
-}
-
-WorldPacket const* WorldPackets::Misc::AccountMountUpdate::Write()
-{
-    _worldPacket.WriteBit(IsFullUpdate);
-    _worldPacket << uint32(Mounts->size());
-
-    for (auto const& spell : *Mounts)
-    {
-        _worldPacket << int32(spell.first);
-        _worldPacket.WriteBits(spell.second, 2);
-    }
-
-    _worldPacket.FlushBits();
-
-    return &_worldPacket;
-}
-
-void WorldPackets::Misc::MountSetFavorite::Read()
-{
-    _worldPacket >> MountSpellID;
-    IsFavorite = _worldPacket.ReadBit();
 }
 
 void WorldPackets::Misc::CloseInteraction::Read()

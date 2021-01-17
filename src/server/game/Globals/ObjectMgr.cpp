@@ -186,21 +186,6 @@ LanguageDesc lang_description[LANGUAGES_COUNT] =
     { LANG_GNOMISH,             7340, SKILL_LANGUAGE_GNOMISH          },
     { LANG_TROLL,               7341, SKILL_LANGUAGE_TROLL            },
     { LANG_GUTTERSPEAK,        17737, SKILL_LANGUAGE_FORSAKEN         },
-    { LANG_DRAENEI,            29932, SKILL_LANGUAGE_DRAENEI          },
-    { LANG_ZOMBIE,            265467, 0                               },
-    { LANG_GNOMISH_BINARY,    265460, 0                               },
-    { LANG_GOBLIN_BINARY,     265461, 0                               },
-    { LANG_WORGEN,             69270, SKILL_LANGUAGE_GILNEAN          },
-    { LANG_GOBLIN,             69269, SKILL_LANGUAGE_GOBLIN           },
-    { LANG_PANDAREN_NEUTRAL,  108127, SKILL_LANGUAGE_PANDAREN_NEUTRAL },
-    { LANG_PANDAREN_ALLIANCE, 108130, 0                               },
-    { LANG_PANDAREN_HORDE,    108131, 0                               },
-    { LANG_SPRITE,            265466, 0                               },
-    { LANG_SHATH_YAR,         265465, 0                               },
-    { LANG_NERGLISH,          265464, 0                               },
-    { LANG_MOONKIN,           265463, 0                               },
-    { LANG_SHALASSIAN,        262439, SKILL_LANGUAGE_SHALASSIAN       },
-    { LANG_THALASSIAN_2,      262454, SKILL_LANGUAGE_THALASSIAN_2     }
 };
 
 LanguageDesc const* GetLanguageDescByID(uint32 lang)
@@ -3716,24 +3701,6 @@ void ObjectMgr::LoadPlayerInfo()
 
                 PlayerInfo* info = _playerInfo[race][class_];
                 if (!info)
-                    continue;
-
-                // skip expansion races if not playing with expansion
-                if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_THE_BURNING_CRUSADE && (race == RACE_BLOODELF || race == RACE_DRAENEI))
-                    continue;
-
-                // skip expansion classes if not playing with expansion
-                if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_WRATH_OF_THE_LICH_KING && class_ == CLASS_DEATH_KNIGHT)
-                    continue;
-
-                // skip expansion races if not playing with expansion
-                if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_CATACLYSM && (race == RACE_GOBLIN || race == RACE_WORGEN))
-                    continue;
-
-                if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_MISTS_OF_PANDARIA && (race == RACE_PANDAREN_NEUTRAL || race == RACE_PANDAREN_HORDE || race == RACE_PANDAREN_ALLIANCE))
-                    continue;
-
-                if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_LEGION && class_ == CLASS_DEMON_HUNTER)
                     continue;
 
                 // fatal error if no level 1 data
@@ -8382,9 +8349,6 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry)
 
     if (sObjectMgr->GetSkillTier(rcEntry->SkillTierID))
         return SKILL_RANGE_RANK;
-
-    if (rcEntry->SkillID == SKILL_RUNEFORGING)
-        return SKILL_RANGE_MONO;
 
     switch (skill->CategoryID)
     {

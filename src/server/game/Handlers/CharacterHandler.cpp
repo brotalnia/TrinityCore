@@ -24,7 +24,6 @@
 #include "AuthenticationPackets.h"
 #include "Battleground.h"
 #include "BattlegroundPackets.h"
-#include "BattlePetPackets.h"
 #include "CalendarMgr.h"
 #include "CharacterPackets.h"
 #include "Chat.h"
@@ -591,7 +590,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
             bool hasDemonHunterReqLevel = (demonHunterReqLevel == 0);
             bool allowTwoSideAccounts = !sWorld->IsPvPRealm() || HasPermission(rbac::RBAC_PERM_TWO_SIDE_CHARACTER_CREATION);
             uint32 skipCinematics = sWorld->getIntConfig(CONFIG_SKIP_CINEMATICS);
-            bool checkDemonHunterReqs = createInfo->Class == CLASS_DEMON_HUNTER && !HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_DEMON_HUNTER);
 
             if (result)
             {
@@ -600,29 +598,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
 
                 Field* field = result->Fetch();
                 uint8 accRace = field[1].GetUInt8();
-
-                if (checkDemonHunterReqs)
-                {
-                    uint8 accClass = field[2].GetUInt8();
-                    if (accClass == CLASS_DEMON_HUNTER)
-                    {
-                        if (freeDemonHunterSlots > 0)
-                            --freeDemonHunterSlots;
-
-                        if (freeDemonHunterSlots == 0)
-                        {
-                            SendCharCreate(CHAR_CREATE_FAILED);
-                            return;
-                        }
-                    }
-
-                    if (!hasDemonHunterReqLevel)
-                    {
-                        uint8 accLevel = field[0].GetUInt8();
-                        if (accLevel >= demonHunterReqLevel)
-                            hasDemonHunterReqLevel = true;
-                    }
-                }
 
                 // need to check team only for first character
                 /// @todo what to if account already has characters of both races?
@@ -641,7 +616,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
 
                 // search same race for cinematic or same class if need
                 /// @todo check if cinematic already shown? (already logged in?; cinematic field)
-                while ((skipCinematics == 1 && !haveSameRace) || createInfo->Class == CLASS_DEMON_HUNTER)
+                while (skipCinematics == 1 && !haveSameRace)
                 {
                     if (!result->NextRow())
                         break;
@@ -651,36 +626,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
 
                     if (!haveSameRace)
                         haveSameRace = createInfo->Race == accRace;
-
-                    if (checkDemonHunterReqs)
-                    {
-                        uint8 accClass = field[2].GetUInt8();
-                        if (accClass == CLASS_DEMON_HUNTER)
-                        {
-                            if (freeDemonHunterSlots > 0)
-                                --freeDemonHunterSlots;
-
-                            if (freeDemonHunterSlots == 0)
-                            {
-                                SendCharCreate(CHAR_CREATE_FAILED);
-                                return;
-                            }
-                        }
-
-                        if (!hasDemonHunterReqLevel)
-                        {
-                            uint8 accLevel = field[0].GetUInt8();
-                            if (accLevel >= demonHunterReqLevel)
-                                hasDemonHunterReqLevel = true;
-                        }
-                    }
                 }
-            }
-
-            if (checkDemonHunterReqs && !hasDemonHunterReqLevel)
-            {
-                SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT_DEMON_HUNTER);
-                return;
             }
 
             Player newChar(this);
@@ -727,7 +673,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
             newChar.CleanupsBeforeDelete();
         };
 
-        if (allowTwoSideAccounts && !skipCinematics && createInfo->Class != CLASS_DEMON_HUNTER)
+        if (allowTwoSideAccounts && !skipCinematics)
         {
             finalizeCharacterCreation(PreparedQueryResult(nullptr));
             return;
@@ -735,7 +681,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPackets::Character::CreateCharact
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_CREATE_INFO);
         stmt->setUInt32(0, GetAccountId());
-        stmt->setUInt32(1, (skipCinematics == 1 || createInfo->Class == CLASS_DEMON_HUNTER) ? 12 : 1);
+        stmt->setUInt32(1, (skipCinematics == 1) ? 12 : 1);
         queryCallback.WithPreparedCallback(std::move(finalizeCharacterCreation)).SetNextQuery(CharacterDatabase.AsyncQuery(stmt));
     }));
 }
@@ -953,10 +899,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         pCurrChar->SetGuildLevel(0);
     }
 
-    // TODO: Move this to BattlePetMgr::SendJournalLock() just to have all packets in one file
-    WorldPackets::BattlePet::BattlePetJournalLockAcquired lock;
-    SendPacket(lock.Write());
-
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
     //Show cinematic at the first time that player login
@@ -966,9 +908,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
         if (ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(pCurrChar->getClass()))
         {
-            if (pCurrChar->getClass() == CLASS_DEMON_HUNTER) /// @todo: find a more generic solution
-                pCurrChar->SendMovieStart(469);
-            else if (cEntry->CinematicSequenceID)
+            if (cEntry->CinematicSequenceID)
                 pCurrChar->SendCinematicStart(cEntry->CinematicSequenceID);
             else if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
                 pCurrChar->SendCinematicStart(rEntry->CinematicSequenceID);
@@ -1624,11 +1564,6 @@ void WorldSession::HandleEquipmentSetSave(WorldPackets::EquipmentSet::SaveEquipm
                 {
                     if (!sItemModifiedAppearanceStore.LookupEntry(saveEquipmentSet.Set.Appearances[i]))
                         return;
-
-                    bool hasAppearance, isTemporary;
-                    std::tie(hasAppearance, isTemporary) = GetCollectionMgr()->HasItemAppearance(saveEquipmentSet.Set.Appearances[i]);
-                    if (!hasAppearance)
-                        return;
                 }
                 else
                     saveEquipmentSet.Set.IgnoreMask |= 1 << i;
@@ -1932,7 +1867,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(std::shared_ptr<WorldPa
         trans->Append(stmt);
 
         // Race specific languages
-        if (factionChangeInfo->RaceID != RACE_ORC && factionChangeInfo->RaceID != RACE_HUMAN && factionChangeInfo->RaceID != RACE_MAGHAR_ORC)
+        if (factionChangeInfo->RaceID != RACE_ORC && factionChangeInfo->RaceID != RACE_HUMAN)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SKILL_LANGUAGE);
             stmt->setUInt64(0, lowGuid);
@@ -1940,12 +1875,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(std::shared_ptr<WorldPa
             switch (factionChangeInfo->RaceID)
             {
                 case RACE_DWARF:
-                case RACE_DARK_IRON_DWARF:
                     stmt->setUInt16(1, 111);
-                    break;
-                case RACE_DRAENEI:
-                case RACE_LIGHTFORGED_DRAENEI:
-                    stmt->setUInt16(1, 759);
                     break;
                 case RACE_GNOME:
                     stmt->setUInt16(1, 313);
@@ -1953,28 +1883,17 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(std::shared_ptr<WorldPa
                 case RACE_NIGHTELF:
                     stmt->setUInt16(1, 113);
                     break;
-                case RACE_WORGEN:
-                    stmt->setUInt16(1, 791);
-                    break;
                 case RACE_UNDEAD_PLAYER:
                     stmt->setUInt16(1, 673);
                     break;
                 case RACE_TAUREN:
-                case RACE_HIGHMOUNTAIN_TAUREN:
                     stmt->setUInt16(1, 115);
                     break;
                 case RACE_TROLL:
                     stmt->setUInt16(1, 315);
                     break;
-                case RACE_BLOODELF:
-                case RACE_VOID_ELF:
-                    stmt->setUInt16(1, 137);
-                    break;
                 case RACE_GOBLIN:
                     stmt->setUInt16(1, 792);
-                    break;
-                case RACE_NIGHTBORNE:
-                    stmt->setUInt16(1, 2464);
                     break;
                 default:
                     TC_LOG_ERROR("entities.player", "Could not find language data for race (%u).", factionChangeInfo->RaceID);
@@ -2003,7 +1922,7 @@ void WorldSession::HandleCharRaceOrFactionChangeCallback(std::shared_ptr<WorldPa
                 {
                     // i = (315 - 1) / 8 = 39
                     // m = 1 << ((315 - 1) % 8) = 4
-                    uint8 deathKnightExtraNode = playerClass != CLASS_DEATH_KNIGHT || i != 39 ? 0 : 4;
+                    uint8 deathKnightExtraNode = i != 39 ? 0 : 4;
                     taximaskstream << uint32(factionMask[i] | deathKnightExtraNode) << ' ';
                 }
 

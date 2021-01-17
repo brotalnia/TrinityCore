@@ -233,20 +233,14 @@ inline float GetGameTableColumnForClass(T const* row, int32 class_)
             return row->Rogue;
         case CLASS_PRIEST:
             return row->Priest;
-        case CLASS_DEATH_KNIGHT:
-            return row->DeathKnight;
         case CLASS_SHAMAN:
             return row->Shaman;
         case CLASS_MAGE:
             return row->Mage;
         case CLASS_WARLOCK:
             return row->Warlock;
-        case CLASS_MONK:
-            return row->Monk;
         case CLASS_DRUID:
             return row->Druid;
-        case CLASS_DEMON_HUNTER:
-            return row->DemonHunter;
         default:
             break;
     }
@@ -268,20 +262,14 @@ inline float GetSpellScalingColumnForClass(GtSpellScalingEntry const* row, int32
             return row->Rogue;
         case CLASS_PRIEST:
             return row->Priest;
-        case CLASS_DEATH_KNIGHT:
-            return row->DeathKnight;
         case CLASS_SHAMAN:
             return row->Shaman;
         case CLASS_MAGE:
             return row->Mage;
         case CLASS_WARLOCK:
             return row->Warlock;
-        case CLASS_MONK:
-            return row->Monk;
         case CLASS_DRUID:
             return row->Druid;
-        case CLASS_DEMON_HUNTER:
-            return row->DemonHunter;
         case -1:
         case -7:
             return row->Item;
